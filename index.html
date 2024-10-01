@@ -23,9 +23,11 @@
                 <button onclick="login()">Login</button>
             </div>
         </main>
+        <button onClick="Settings()">Settings</button>
     </div>
     <script>
         var token = '';
+        
         function login(){
             const data = {
                 username: document.getElementById('username').value,
@@ -37,9 +39,24 @@
                     document.getElementById('password').value = '';
                     if(res && res.data && res.data.success){
                         token = res.data.token;
+                        localStorage.setItem('jwt', token);
                         getDashboard();
                     }
                 })
+        }
+
+        function Settings(){
+            axios.get('/api/settings', {
+                headers: { 'Authorization': `Bearer ${token}`}
+            }).then(res => {
+                if(res && res.data && res.data.success){
+                    document.querySelector('h1.row').innerHTML = 'Settings';
+                    document.querySelector('main').innerHTML = res.data.myContent;
+                    history.pushState(null, '', 'http://localhost:3000/Settings');
+                    document.title = 'Settings';
+                }
+
+            })
         }
 
         function getDashboard(){
@@ -49,6 +66,8 @@
                 if(res && res.data && res.data.success){
                     document.querySelector('h1.row').innerHTML = 'Dashboard';
                     document.querySelector('main').innerHTML = res.data.myContent;
+                    history.pushState(null, '', 'http://localhost:3000/Dashboard');
+                    document.title = 'Dashboard';
                 }
 
             })
