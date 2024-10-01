@@ -40,7 +40,7 @@ app.post('/api/login', (req, res) => {
 
     for (let user of users){
         if (username == user.username && password == user.password){
-            let token = jwt.sign({ id: user.id, username: user.username}, secretKey, { expiresIn: "3m"});
+            let token = jwt.sign({ id: user.id, username: user.username}, secretKey, { expiresIn: 180});
             res.json({
                 success: true,
                 err: null,
@@ -77,15 +77,18 @@ app.get('/', (req, res) => {
 });
 
 app.use(function (err, req, res, next){
-    if (err.name === 'UnathorizedError'){
+    /*if (err.name === 'UnathorizedError'){
         res.status(401).json({
             sucess: false,
             err
         })
+        res.sendFile(path.join(__dirname, 'index.html'));
     }
     else{
         next(err);
-    }
+        res.sendFile(path.join(__dirname, 'index.html'));
+    }*/
+   res.sendFile(path.join(__dirname, 'index.html'));
 })
 
 app.listen(PORT, () => {

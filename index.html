@@ -23,11 +23,12 @@
                 <button onclick="login()">Login</button>
             </div>
         </main>
-        <button onClick="Settings()">Settings</button>
+        <button class="Settingsclick" onClick="Settings()">Settings</button>
+        <button class="Dashboardclick" onClick="getDashboard()">Dashboard</button>
     </div>
     <script>
         var token = '';
-        
+        var memory = 0;
         function login(){
             const data = {
                 username: document.getElementById('username').value,
@@ -46,20 +47,34 @@
         }
 
         function Settings(){
-            axios.get('/api/settings', {
-                headers: { 'Authorization': `Bearer ${token}`}
-            }).then(res => {
+            try{
+                axios.get('/api/settings', {
+                    headers: { 'Authorization': `Bearer ${token}`}
+                }).then(res => {
                 if(res && res.data && res.data.success){
                     document.querySelector('h1.row').innerHTML = 'Settings';
                     document.querySelector('main').innerHTML = res.data.myContent;
                     history.pushState(null, '', 'http://localhost:3000/Settings');
+                    document.querySelector('button.Settingsclick').style.display='none';
+                    document.querySelector('button.Dashboardclick').style.display='block';
                     document.title = 'Settings';
+                    memory++;
                 }
-
+                else{
+                    history.go(-memory);
+                    window.addEventListener('popstate', (event) => {
+                        history.go();
+                    })
+                }
             })
+        }
+        catch (error){
+            history.go(-memory).then(history.go())
+        }
         }
 
         function getDashboard(){
+            try{
             axios.get('/api/dashboard', {
                 headers: { 'Authorization': `Bearer ${token}`}
             }).then(res => {
@@ -67,10 +82,23 @@
                     document.querySelector('h1.row').innerHTML = 'Dashboard';
                     document.querySelector('main').innerHTML = res.data.myContent;
                     history.pushState(null, '', 'http://localhost:3000/Dashboard');
+                    document.querySelector('button.Dashboardclick').style.display='none';
+                    document.querySelector('button.Settingsclick').style.display='block';
                     document.title = 'Dashboard';
+                    memory++;
                 }
-
+                else{
+                    history.go(-memory);
+                    window.addEventListener('popstate', (event) => {
+                        history.go();
+                    })
+                }
             })
+        }
+        catch (error){
+            history.go(-memory).then(history.go());
+            
+        }
         }
     </script>
 </body>
